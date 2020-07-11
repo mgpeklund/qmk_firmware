@@ -18,7 +18,13 @@ LED_ANIMATIONS = yes        # LED animations
 #IOS_DEVICE_ENABLE = no      # connect to IOS device (iPad,iPhone)
 
 OLED_DRIVER_ENABLE = yes
-WPM_ENABLE = yes
+WPM_ENABLE = no
+SPLIT_KEYBOARD = yes
+SPLIT_COMMUNICATION = i2c
+
+SRC += tetris.c
+
+CONSOLE_ENABLE = no
 
 # convert Helix-specific options (that represent combinations of standard options)
 #   into QMK standard options.

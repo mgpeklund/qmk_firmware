@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdio.h>
 #include <stdint.h>
 #include <timer.h>
 
@@ -8,17 +9,29 @@
 # include <avr/pgmspace.h>
 #endif
 
-/*
-#define WELL_X (10)
-#define WELL_Y (24)
-uint8_t well[WELL_X][WELL_Y];*/ /* the tetris well where all peices fall */
+#define screen_byte_index(x,y) ((32 * (y >> 3)) + x)
+#define well_byte_index(x,y) ((10 * (y >> 3)) + x)
 
-#define BOARD_SIZE (512)
-static const char PROGMEM tetris_screen[BOARD_SIZE] = {
-  // 'tetris_logo', 32x8px (this is static and will allways be here. no need to add it later)
-  0x00, 0x82, 0xbe, 0xbe, 0x82, 0x80, 0xbe, 0xbe, 0xaa, 0xa2, 0x80, 0x82, 0xbe, 0xbe, 0x82, 0x80, 
-  0xbe, 0xbe, 0x8a, 0xb4, 0x80, 0xa2, 0xbe, 0xbe, 0xa2, 0x80, 0xa4, 0xae, 0xba, 0x92, 0x80, 0x00
+#define WELL_WIDTH  (10)
+#define WELL_HEIGHT (24)
+#define LOGO_SIZE   (32)
+#define WELL_SIZE   (30)
+#define SCREEN_BYTES (512)
+
+
+
+enum tetris_input {
+  left = 0,
+  right,
+  down,
+  rotate
 };
+
+#define TETRIS_FLAG_LEFT    (1 << left)
+#define TETRIS_FLAG_RIGHT   (1 << right)
+#define TETRIS_FLAG_DOWN    (1 << down)
+#define TETRIS_FLAG_ROTATE  (1 << rotate)
+
 
 /**
  * Rotate function
@@ -46,4 +59,47 @@ void tetris_render(void);
  */
 void tetris_update_well(void);
 
+/**
+ *
+ */
+void tetris_clear_screen_mem(void);
 
+/**
+ *
+ */
+void draw_square(uint16_t x, uint16_t y, uint16_t len);
+
+/**
+ *
+ */
+void draw_current_tetromino(void);
+
+/**
+ *
+ */
+void draw_current_well(void);
+
+/**
+ *
+ */
+void tetris_tick(void);
+
+/**
+ *
+ */
+void tetris_rotate(void);
+
+/**
+ *
+ */
+bool tetris_does_tetromino_fit(int,int,uint8_t);
+
+
+/* controller code */
+
+void tetris_player_input(enum tetris_input);
+
+void tetris_player_move_left(void);
+void tetris_player_move_right(void);
+void tetris_player_move_down(void);
+void tetris_player_rotate(void);

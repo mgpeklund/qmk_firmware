@@ -1,19 +1,24 @@
 #include QMK_KEYBOARD_H
 #include "bootloader.h"
-#ifdef PROTOCOL_LUFA
-#include "lufa.h"
-#include "split_util.h"
-#endif
 
 #include "keymap_local.h"
 
-#ifdef OLED_DRIVER_ENABLE
-# include "display.h"
+#ifdef CONSOLE_ENABLE
+# include <print.h>
 #endif
 
 #ifdef TETRIS_ENABLE
 # include "tetris.h"
 #endif
+
+#ifdef OLED_DRIVER_ENABLE
+# include "display.h"
+#endif
+
+#ifdef WPM_ENABLE
+# include "wpm_animation.h"
+#endif
+
 
 #ifdef RGBLIGHT_ENABLE
 //Following line allows macro to read current RGB settings
@@ -46,9 +51,23 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case QWERTY:
       if (record->event.pressed) {
         persistent_default_layer_set(1UL<<_QWERTY);
+        set_default_renderers();
+        oled_init(OLED_ROTATION_0);
       }
       return false;
       break;
+#ifdef TETRIS_ENABLE
+    case TETRIS:
+     if (record->event.pressed) {
+        oled_off();
+        master_screen_renderer = &tetris_tick;
+        tetris_init();
+        oled_init(OLED_ROTATION_270);
+        persistent_default_layer_set(1UL<<_TETRIS);
+      }
+      return false;
+      break;
+#endif
     case LOWER:
       if (record->event.pressed) {
           //not sure how to have keyboard check mode and set it to a variable, so my work around
@@ -72,6 +91,33 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       return false;
       break;
+#ifdef TETRIS_ENABLE
+    case T_LEFT:
+      if(record->event.pressed) {
+        tetris_player_input(left);
+      }
+      return false;
+      break;
+    case T_DOWN:
+       if(record->event.pressed) {
+        tetris_player_input(down);
+      }
+      return false;
+      break;
+    case T_RIGHT:
+       if(record->event.pressed) {
+        tetris_player_input(right);
+      }
+      return false;
+      break;
+    case T_ROT:
+      if(record->event.pressed) {
+        tetris_player_input(rotate);
+      }
+      return false;
+      break;
+#endif
+
     case RAISE:
       if (record->event.pressed) {
         //not sure how to have keyboard check mode and set it to a variable, so my work around
@@ -118,7 +164,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       if (record->event.pressed) {
         if(keymap_config.swap_lalt_lgui==false){
           register_code(KC_LANG2);
-        }else{
+        } else {
           SEND_STRING(SS_LALT("`"));
         }
       } else {
