@@ -18,8 +18,6 @@
 #define WELL_SIZE   (30)
 #define SCREEN_BYTES (512)
 
-
-
 enum tetris_input {
   left = 0,
   right,
@@ -55,21 +53,6 @@ void tetris_reset(void);
 void tetris_render(void);
 
 /**
- * updates the state of the well.
- */
-void tetris_update_well(void);
-
-/**
- *
- */
-void tetris_clear_screen_mem(void);
-
-/**
- *
- */
-void draw_square(uint16_t x, uint16_t y, uint16_t len);
-
-/**
  *
  */
 void draw_current_tetromino(void);
@@ -87,19 +70,10 @@ void tetris_tick(void);
 /**
  *
  */
-void tetris_rotate(void);
-
-/**
- *
- */
 bool tetris_does_tetromino_fit(int,int,uint8_t);
 
-
-/* controller code */
-
+/**
+ * controller code
+ */
 void tetris_player_input(enum tetris_input);
 
-void tetris_player_move_left(void);
-void tetris_player_move_right(void);
-void tetris_player_move_down(void);
-void tetris_player_rotate(void);

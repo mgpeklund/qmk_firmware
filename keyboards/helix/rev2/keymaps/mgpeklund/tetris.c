@@ -7,12 +7,16 @@
 #include <string.h>
 
 
+void draw_square(uint16_t, uint16_t, uint16_t);
+
+
 int x_pos; 
 int y_pos;
 
 uint8_t flags;
 
-uint8_t current_tetromino = 6;
+uint8_t tetro_mem;
+uint8_t next_tetromino;
 uint8_t current_rotation = 0x00;
 
 uint16_t drop_timer;
@@ -39,7 +43,9 @@ char draw_bits[8] = {
   0x80
 };
 
-uint16_t tetromino[7] = { 
+uint8_t rows_to_be_removed[3] = {0x00,0x00,0x00};
+
+uint16_t tetrominos[7] = {
   0b0010001000100010, // __1_
                       // __1_
                       // __1_
@@ -78,8 +84,11 @@ uint16_t tetromino[7] = {
 
 #define translate_to_screen_x_cord(x) (3 * (x) + 1)
 #define translate_to_screen_y_cord(y) (3 * (y) + 55)
-#define get_tetromino_bit(k)  ( (tetromino[current_tetromino] & (0x8000 >> k)) >> (15 - k) )
 #define get_byte_bit(byte, k) ((byte & (0x80 >> k)) >> (7 - k))
+#define current_tetromino (uint8_t)(tetro_mem & 0b00000111)
+#define next_tetromino    (tetro_mem & 0b00111000)
+#define get_tetromino_bit(k) ((tetrominos[current_tetromino] & (0x8000 >> k)) >> (15 - k) )
+
 
 uint8_t tetris_rotate_tetromino(int px, int py, int r) {
   switch(r % 4) {
@@ -91,21 +100,17 @@ uint8_t tetris_rotate_tetromino(int px, int py, int r) {
   return 0;
 }
 
-/*
- * Sets up the well.
- */
 void tetris_init() {
   x_pos = 3;
   y_pos = 0;
+
+  tetro_mem = (uint8_t) (timer_read() % 7 ) << 3 | ((timer_read() % 7) & 0x07);
 
   memset(well, 0x00, sizeof(uint8_t) * (WELL_WIDTH * WELL_HEIGHT));
   
   drop_timer = timer_read();
   drop_time = 1000;
 };
-
-uint16_t move_timer = 0;
-uint16_t tmp_timer;
 
 void tetris_render() {
   // clear screen after logo
@@ -120,6 +125,7 @@ void tetris_render() {
   // render to screen
   oled_write_raw(screen,SCREEN_BYTES);
 };
+
 void draw_current_tetromino() {
   uint8_t k = 1,px,py;
 
@@ -198,11 +204,23 @@ void tetris_force_down(void) {
       }
     }
 
-    // clear lines
-    // Move down bits above.
+    // TODO clear lines
+    // TODO Move down bits above.
+    for (py = y_pos; py < (y_pos + 4); py++) {
+      bool full_row = true;
+      for (px = 0; px < WELL_WIDTH; px++) {
+        if( !(well[well_byte_index(px,py)] & (0x80 >> (py % 8)))) {
+          full_row = false;
+          break;
+        }
+      }
 
+      if (full_row) {
 
-    current_tetromino = (uint8_t)(timer_read() & 0xFF) % 7;
+      }
+    }
+
+    tetro_mem = (uint8_t)(timer_read() % 7 << 3 ) | (tetro_mem >> 3);
     x_pos = 3;
     y_pos = 0;
 
@@ -238,11 +256,6 @@ void tetris_tick() {
 
   flags = 0x00;
 
-  // TODO Force block down periodically
-  // if the block fits below, move current tetromino down
-  // else lock into place and update the well
-  // if tetromino locked into place, then check for full lines to be removed.
-  // (we only need to check the 2-4 lines that the tetromino overlaps)
   if (timer_elapsed(drop_timer) > drop_time) {
     tetris_force_down();
     drop_timer = timer_read();
@@ -253,11 +266,8 @@ void tetris_tick() {
 
 void tetris_reset() {
   // TODO implement me!
-}
-
-
-void tetris_update_well() {
-  // TODO implement me!
+  // 1 add keybinding for reset
+  // 2 enable if gameover == true
 }
 
 void draw_square(uint16_t x, uint16_t y, uint16_t len) {
@@ -272,38 +282,6 @@ void draw_square(uint16_t x, uint16_t y, uint16_t len) {
 
 void tetris_player_input(enum tetris_input input) {
   flags |= (1 << input);
-}
-
-void tetris_rotate() {
-  
-}
-
-
-void tetris_player_move_left()
-{
-  if(tetris_does_tetromino_fit(x_pos - 1, y_pos, current_rotation)) {
-    x_pos = x_pos - 1;
-  }
-}
-
-void tetris_player_move_right()
-{
-  if(tetris_does_tetromino_fit(x_pos + 1, y_pos, current_rotation)) {
-    x_pos = x_pos + 1;
-  }
-}
-
-
-void tetris_player_move_down()
-{
-  if(tetris_does_tetromino_fit(x_pos, y_pos + 1, current_rotation)) {
-    y_pos = y_pos + 1;
-  }
-
-}
-void tetris_player_rotate()
-{
-  tetris_rotate();
 }
 
 

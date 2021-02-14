@@ -3,10 +3,6 @@
 
 #include "keymap_local.h"
 
-#ifdef CONSOLE_ENABLE
-# include <print.h>
-#endif
-
 #ifdef TETRIS_ENABLE
 # include "tetris.h"
 #endif
