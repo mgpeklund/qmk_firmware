@@ -12,8 +12,11 @@
 extern rgblight_config_t rgblight_config;
 #endif
 
-#include "layers.h"
+#ifdef WPM_ENABLE
+# include "wpm_animation.h"
+#endif
 
+#include "layers.h"
 
 
 //assign the right code to your layers for OLED display

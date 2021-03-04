@@ -5,7 +5,7 @@
 #   See TOP/keyboards/helix/rules.mk for a list of options that can be set.
 #   See TOP/docs/config_options.md for more information.
 #
-LINK_TIME_OPTIMIZATION_ENABLE = yes  # if firmware size over limit, try this option
+LTO_ENABLE = yes  # if firmware size over limit, try this option
 
 # Helix Spacific Build Options
 # you can uncomment and edit follows 7 Variables
@@ -21,7 +21,8 @@ OLED_DRIVER_ENABLE = yes
 WPM_ENABLE = no
 SPLIT_KEYBOARD = yes
 SPLIT_COMMUNICATION = i2c
-
+BOOTLOADER = dfu
+TETRIS_ENABLE = yes
 SRC += tetris.c
 
 CONSOLE_ENABLE = no

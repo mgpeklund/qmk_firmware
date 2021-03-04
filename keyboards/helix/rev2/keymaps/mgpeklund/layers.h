@@ -6,11 +6,11 @@
 // entirely and just use numbers.
 enum layer_number {
     _QWERTY = 0,
-    _LOWER = 1,
-    _RAISE = 2,
-    _ADJUST = 3,
+    _LOWER,
+    _RAISE,
+    _ADJUST,
 #ifdef TETRIS_ENABLE
-    _TETRIS = 4,
+    _TETRIS,
 #endif
 };
 
